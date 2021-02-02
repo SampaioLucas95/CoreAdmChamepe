@@ -50,7 +50,7 @@ namespace CoreAdmChamepe.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "IgrejaId,IgrejaDescricao,IgrejaStatus,IgrejaPastorDescricao,IgrejaContrato,IgrejaSetor,IgrejaDataCadastro,UserId")] Igreja igreja)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && User.Identity.IsAuthenticated)
             {
                 igreja.UserId = dbUser.Users.Where(x => x.UserName.Equals(User.Identity.Name)).FirstOrDefault().Id;
                 db.Igrejas.Add(igreja);
@@ -83,7 +83,7 @@ namespace CoreAdmChamepe.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "IgrejaId,IgrejaDescricao,IgrejaStatus,IgrejaPastorDescricao,IgrejaContrato,IgrejaSetor,IgrejaDataCadastro,UserId")] Igreja igreja)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && User.Identity.IsAuthenticated)
             {
                 igreja.UserId = dbUser.Users.Where(x => x.UserName.Equals(User.Identity.Name)).FirstOrDefault().Id;
                 db.Entry(igreja).State = EntityState.Modified;
@@ -113,9 +113,12 @@ namespace CoreAdmChamepe.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Igreja igreja = db.Igrejas.Find(id);
-            db.Igrejas.Remove(igreja);
-            db.SaveChanges();
+            if (User.Identity.IsAuthenticated)
+            {
+                Igreja igreja = db.Igrejas.Find(id);
+                db.Igrejas.Remove(igreja);
+                db.SaveChanges();
+            }           
             return RedirectToAction("Index");
         }
 

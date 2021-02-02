@@ -26,7 +26,7 @@ namespace CoreAdmChamepe.Controllers
             }
             else
             {
-                 participanteEventoes = db.ParticipanteEventoes.Where(p => p.UserId == dbUser.Users.Where(x => x.UserName.Equals(User.Identity.Name)).FirstOrDefault().Id).Include(p => p.Evento).Include(p => p.Igreja);
+                 participanteEventoes = db.ParticipanteEventoes.Include(p => p.Evento).Include(p => p.Igreja).ToList().Where(p => p.UserId == dbUser.Users.Where(x => x.UserName.Equals(User.Identity.Name)).FirstOrDefault().Id);
             }
 
             ViewBag.TotalGeralPessoasCadastradas = db.ParticipanteEventoes.Count();
@@ -63,7 +63,7 @@ namespace CoreAdmChamepe.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "PartcipanteNomeCompleto,ParticipanteRg,ParticipanteEmail,ParticipanteTelefone,ParticipanteIdade,IgrejaId,EventoId")] ParticipanteEvento participanteEvento)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && User.Identity.IsAuthenticated)
             {                
                 if (db.Eventoes.Where(x => x.EventoId == participanteEvento.EventoId).FirstOrDefault().EventoLimitePessoas <= db.ParticipanteEventoes.Count())
                 {
@@ -107,7 +107,7 @@ namespace CoreAdmChamepe.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "ParticipanteEventoId,PartcipanteNomeCompleto,ParticipanteRg,ParticipanteEmail,ParticipanteTelefone,ParticipanteIdade,IgrejaId,EventoId")] ParticipanteEvento participanteEvento)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && User.Identity.IsAuthenticated)
             {
                 participanteEvento.UserId = dbUser.Users.Where(x => x.UserName.Equals(User.Identity.Name)).FirstOrDefault().Id;
                 db.Entry(participanteEvento).State = EntityState.Modified;
@@ -139,9 +139,11 @@ namespace CoreAdmChamepe.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            ParticipanteEvento participanteEvento = db.ParticipanteEventoes.Find(id);
-            db.ParticipanteEventoes.Remove(participanteEvento);
-            db.SaveChanges();
+            if (User.Identity.IsAuthenticated) {
+                ParticipanteEvento participanteEvento = db.ParticipanteEventoes.Find(id);
+                db.ParticipanteEventoes.Remove(participanteEvento);
+                db.SaveChanges();               
+            }
             return RedirectToAction("Index");
         }
 

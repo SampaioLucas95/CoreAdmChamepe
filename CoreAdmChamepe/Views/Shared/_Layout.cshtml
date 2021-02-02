@@ -8,13 +8,12 @@
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     <style>
-        body-login {
-            background: #1c476d;
-            color: #fff !important;
+        .body-login {
+            background: #f3f3f375!important;
         }
     </style>
 </head>
-<body class="@(Request.IsAuthenticated ? "body-login" : "")">
+<body class="@(Request.IsAuthenticated ? "" : "body-login")">
 
     <div class="navbar navbar-collapse navbar-fixed-top">
         <div class="container">

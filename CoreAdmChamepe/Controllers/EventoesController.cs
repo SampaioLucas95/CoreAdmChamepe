@@ -50,7 +50,7 @@ namespace CoreAdmChamepe.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "EventoId,EventoDescricao,EventoData,EventoDataCadastro,UserId,EventoLimitePessoas")] Evento evento)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid  && User.Identity.IsAuthenticated)
             {
                 evento.UserId = dbUser.Users.Where(x => x.UserName.Equals(User.Identity.Name)).FirstOrDefault().Id;
                 db.Eventoes.Add(evento);
@@ -83,7 +83,7 @@ namespace CoreAdmChamepe.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "EventoId,EventoDescricao,EventoData,EventoDataCadastro,UserId,EventoLimitePessoas")] Evento evento)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && User.Identity.IsAuthenticated)
             {
                 evento.UserId = dbUser.Users.Where(x => x.UserName.Equals(User.Identity.Name)).FirstOrDefault().Id;
                 db.Entry(evento).State = EntityState.Modified;
@@ -113,9 +113,11 @@ namespace CoreAdmChamepe.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Evento evento = db.Eventoes.Find(id);
-            db.Eventoes.Remove(evento);
-            db.SaveChanges();
+            if (User.Identity.IsAuthenticated) {
+                Evento evento = db.Eventoes.Find(id);
+                db.Eventoes.Remove(evento);
+                db.SaveChanges();
+            }
             return RedirectToAction("Index");
         }
 
